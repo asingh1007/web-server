@@ -14,6 +14,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      # Setup Terraform
+    - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.13.5
 
     # Configure Docker login
     - run: |-
@@ -38,11 +42,6 @@ jobs:
         export GOOGLE_CREDENTIALS=$(echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d)
         echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
         gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
-
-    # Setup Terraform
-    - uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 0.13.5
 
     # Terraform init and plan
     - name: Terraform Plan

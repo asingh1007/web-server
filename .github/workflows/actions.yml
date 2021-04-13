@@ -31,11 +31,15 @@ jobs:
     - name: Publish
       run: |-
         docker push "asingh01/test-images:webserver"
+    
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@v0.2.0
+      with:
+        service_account_key: ${{ secrets.SERVICE_ACCOUNT }}
+        project_id: ${{ secrets.PROJECT_ID }}
 
-    - name: Terraform Setup
-      run: |-
-        curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - \
-        && apt install software-properties-common -y \
-        && apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
-        && apt update \
-        && apt install terraform=0.13.5
+    # Setup Terraform
+    - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.13.5
+

@@ -36,16 +36,12 @@ jobs:
       run: |-
         docker push "asingh01/test-images:webserver"
     
-    # Setup gcloud CLI
-    - name: Setup GCloud CLI
+    # Setup and Run Terraform init and plan
+    - name: Terraform Plan
       run: |-
         export GOOGLE_CREDENTIALS=$(echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d)
         echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
         gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
-
-    # Terraform init and plan
-    - name: Terraform Plan
-      run: |-
         cd terraform
         terraform init
         terraform plan

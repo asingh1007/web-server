@@ -18,6 +18,9 @@ jobs:
     - uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 0.13.5
+      #Setup Helmfile
+    - name: Setup helmfile
+      uses: mamezou-tech/setup-helmfile@v0.8.0
 
     # Configure Docker login
     - run: |-
@@ -44,4 +47,15 @@ jobs:
         gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
         cd terraform
         terraform init
-        terraform plan
+        terraform plan -out plan.tfplan
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |-
+      export GOOGLE_CREDENTIALS=$(echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d)
+      echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
+      gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
+      cd terraform
+      terraform init
+      terraform apply -auto-approve
+

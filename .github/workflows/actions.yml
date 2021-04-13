@@ -35,13 +35,9 @@ jobs:
     # Setup gcloud CLI
     - name: Setup GCloud CLI
       run: |-
-        export GOOGLE_CREDENTIALS=$(echo $SERVICE_ACCOUNT | base64 -d)
-        echo $SERVICE_ACCOUNT | base64 -d > key.json
-        gcloud auth activate-service-account ${SERVICE_ACCOUNT_ID} --key-file=./key.json --project=${PROJECT_ID}
-      env:
-        service_account_key: ${{ secrets.SERVICE_ACCOUNT }}
-        project_id: ${{ secrets.PROJECT_ID }}
-        SERVICE_ACCOUNT_ID: ${{ secrets.SERVICE_ACCOUNT_ID }}
+        export GOOGLE_CREDENTIALS=$(echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d)
+        echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
+        gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
 
     # Setup Terraform
     - uses: hashicorp/setup-terraform@v1

@@ -1,0 +1,19 @@
+helmDefaults:
+  force: false
+  tillerNamespace: default
+  tillerless: true
+  timeout: {{env "HELMFILE_TIMEOUT"| default "600" }}
+  verify: false
+  wait: true
+  atomic: true
+
+releases:
+- name: mediawiki
+  namespace: default
+  chart: ./mediawiki
+  version: 0.1.0
+  missingFileHandler: Info
+  installed: true
+  values:
+  # Generic values
+  - mediawiki/values.yaml.gotmpl

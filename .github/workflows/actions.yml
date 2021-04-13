@@ -60,3 +60,20 @@ jobs:
         cd terraform
         terraform init
         terraform apply -auto-approve
+
+    - name: Helmfile Lint(Lint Changes for Kubernetes Resources)
+      run: |-
+        echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
+        gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
+        gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }} --region ${{ secrets.REGION }}
+        helm plugin install https://github.com/databus23/helm-diff
+        helmfile lint
+        helmfile diff --suppress-secrets
+
+    - name: Helmfile Sync(Deploy Changes for Kubernetes Resources)
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |-
+        echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
+        gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
+        gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }} --region ${{ secrets.REGION }}
+        helmfile sync

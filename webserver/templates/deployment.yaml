@@ -28,12 +28,24 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /healthcheck
+              path: /healthcheck/
               port: 80
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 60
+            periodSeconds: 60
+            successThreshold: 1
+            failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /healthcheck
+              path: /healthcheck/
               port: 80
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 60
+            periodSeconds: 60
+            successThreshold: 1
+            failureThreshold: 3
           resources:
             limits:
               cpu: 100m

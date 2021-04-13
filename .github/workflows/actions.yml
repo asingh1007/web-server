@@ -66,7 +66,6 @@ jobs:
         echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
         gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
         gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }} --region ${{ secrets.REGION }}
-        helm plugin install https://github.com/databus23/helm-diff
         helmfile lint
         helmfile diff --suppress-secrets
 

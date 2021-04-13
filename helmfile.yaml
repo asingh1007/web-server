@@ -8,12 +8,12 @@ helmDefaults:
   atomic: true
 
 releases:
-- name: mediawiki
+- name: webserver
   namespace: default
-  chart: ./mediawiki
+  chart: ./webserver
   version: 0.1.0
   missingFileHandler: Info
   installed: true
   values:
   # Generic values
-  - mediawiki/values.yaml.gotmpl
+  - webserver/values.yaml.gotmpl

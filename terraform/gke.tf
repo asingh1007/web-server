@@ -11,7 +11,7 @@ module "gke" {
   ip_range_services          = "secondary-range-name"
   horizontal_pod_autoscaling = "true"
   network_policy             = "false"
-  kubernetes_version         = "1.18.15-gke.1500"
+  kubernetes_version         = "1.18.16-gke.502"
   default_max_pods_per_node  = 16
   node_pools = [
     {

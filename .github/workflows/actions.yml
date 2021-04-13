@@ -52,10 +52,9 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: |-
-      export GOOGLE_CREDENTIALS=$(echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d)
-      echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
-      gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
-      cd terraform
-      terraform init
-      terraform apply -auto-approve
-
+        export GOOGLE_CREDENTIALS=$(echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d)
+        echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
+        gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
+        cd terraform
+        terraform init
+        terraform apply -auto-approve

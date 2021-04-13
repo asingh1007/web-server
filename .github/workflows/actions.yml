@@ -3,7 +3,9 @@ name: Build and Deploy to GKE
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ develop ]
+    branches: 
+    - main
+    - develop
 
 jobs:
   setup-build-publish-deploy:

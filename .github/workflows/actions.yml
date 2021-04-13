@@ -1,0 +1,62 @@
+name: Build and Deploy to GKE
+
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: 
+    - main
+    - develop
+
+jobs:
+  setup-build-publish-deploy:
+    name: Build and Push Docker
+    runs-on: ubuntu-latest
+    environment: test
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      # Setup Terraform
+    - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.13.5
+      #Setup Helmfile
+    - name: Setup helmfile
+      uses: mamezou-tech/setup-helmfile@v0.8.0
+
+    # Configure Docker login
+    - run: |-
+        docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
+
+    # Build the Docker image
+    - name: Build
+      run: |-
+        docker build -t "asingh01/test-images:webserver" .
+
+    # Push the Docker image to Google Container Registry
+    - name: Publish
+      run: |-
+        docker push "asingh01/test-images:webserver"
+    
+    # Setup and Run Terraform init and plan
+    - name: Terraform Plan
+      run: |-
+        export GOOGLE_CREDENTIALS=$(echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d)
+        echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
+        gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
+        cd terraform
+        terraform init
+        terraform plan -out plan.tfplan
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |-
+        export GOOGLE_CREDENTIALS=$(echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d)
+        echo ${{ secrets.SERVICE_ACCOUNT }} | base64 -d > key.json
+        gcloud auth activate-service-account ${{ secrets.SERVICE_ACCOUNT_ID }} --key-file=./key.json --project=${{ secrets.PROJECT_ID }}
+        cd terraform
+        terraform init
+        terraform apply -auto-approve
